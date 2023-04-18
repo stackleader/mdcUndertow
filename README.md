@@ -39,7 +39,15 @@ To make all applications benefit from the `CorrelationIdGenerator` and `Wrapping
 /subsystem=undertow/server=default-server/host=default-host/filter-ref=correlation-id-generator:add
 ```
 
-### 6. Reload the server
+### 6. Modify the pattern-formatter to include the correlationId:
+
+In the JBoss CLI, enter the following command to modify the pattern-formatter of the logging subsystem to include the correlationId from the Mapped Diagnostic Context (MDC) in each log message:
+
+```
+/subsystem=logging/pattern-formatter=PATTERN_FORMATTER_NAME:write-attribute(name=pattern, value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) [correlationId=%X{correlationId}] %s%e%n")
+```
+
+### 7. Reload the server
 
 To apply the configuration changes, enter the following command in the JBoss CLI:
 
