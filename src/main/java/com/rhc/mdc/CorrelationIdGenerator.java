@@ -27,18 +27,10 @@ public class CorrelationIdGenerator implements HttpHandler {
         String correlationIdHeader = Optional.ofNullable(exchange.getRequestHeaders().get("X-Correlation-Id"))
                 .map(HeaderValues::getFirst)
                 .orElse(UUID.randomUUID().toString());
-        String sidHeader = Optional.ofNullable(exchange.getRequestHeaders().get("sid"))
-                .map(HeaderValues::getFirst)
-                .orElse("");
         String uuidHeader = Optional.ofNullable(exchange.getRequestHeaders().get("uuid"))
                 .map(HeaderValues::getFirst)
                 .orElse(correlationIdHeader);
-        String tracerDetails = "sid=" + sidHeader + ", uuid=" + uuidHeader;
-        if (correlationIdHeader.contains("sid=")) {
-            MDC.put("correlationId", correlationIdHeader);
-        } else {
-            MDC.put("correlationId", tracerDetails);
-        }
+        MDC.put("correlationId", uuidHeader);
         if (LOG.isTraceEnabled()) {
             LOG.trace("[Request Headers]");
             for (HeaderValues header : exchange.getRequestHeaders()) {
@@ -73,7 +65,7 @@ public class CorrelationIdGenerator implements HttpHandler {
         public void exchangeEvent(HttpServerExchange exchange, NextListener nextListener) {
             try {
                 LOG.info("[METRICS] Response Time for requestMethod={} requestPath={}: {} ms, httpResponseCode={}", exchange.getRequestMethod(), exchange.getRequestPath(), stopwatch.stop().elapsed(TimeUnit.MILLISECONDS), exchange.getStatusCode());
-                
+
             } finally {
                 if (nextListener != null) {
                     nextListener.proceed();
