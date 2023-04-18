@@ -1,6 +1,3 @@
-Sure! Here's the response converted to Markdown format for a GitHub `README.md` file:
-
-```markdown
 ## Installing mdc-undertow-ext-3.0.1.jar as a global module in JBoss EAP 7
 
 Follow these steps to install the `mdc-undertow-ext-3.0.1.jar` as a global module in JBoss EAP 7 (WildFly 10) using the JBoss CLI:
@@ -51,4 +48,3 @@ reload
 ```
 
 After completing these steps, the `mdc-undertow-ext-3.0.1.jar` will be installed as a global module in JBoss EAP 7, and all applications deployed on the server will benefit from the `CorrelationIdGenerator` and `WrappingMdcExecutor` classes.
-```
