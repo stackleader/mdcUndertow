@@ -1,6 +1,3 @@
-Sure! Here's the response converted to Markdown format for a GitHub `README.md` file:
-
-```markdown
 ## Installing mdc-undertow-ext-3.0.1.jar as a global module in JBoss EAP 7
 
 Follow these steps to install the `mdc-undertow-ext-3.0.1.jar` as a global module in JBoss EAP 7 (WildFly 10) using the JBoss CLI:
@@ -42,7 +39,15 @@ To make all applications benefit from the `CorrelationIdGenerator` and `Wrapping
 /subsystem=undertow/server=default-server/host=default-host/filter-ref=correlation-id-generator:add
 ```
 
-### 6. Reload the server
+### 6. Modify the pattern-formatters to include the correlationId:
+
+In the JBoss CLI, enter the following commands to modify the pattern-formatters of the logging subsystem to include the correlationId from the Mapped Diagnostic Context (MDC) in each log message:
+
+```
+/subsystem=logging/pattern-formatter=PATTERN_FORMATTER_NAME:write-attribute(name=pattern, value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) [correlationId=%X{correlationId}] %s%e%n")
+/subsystem=logging/pattern-formatter=COLOR-PATTERN:write-attribute(name=pattern, value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c] (%t) [correlationId=%X{correlationId}] %s%e%n")
+```
+### 7. Reload the server
 
 To apply the configuration changes, enter the following command in the JBoss CLI:
 
@@ -51,4 +56,3 @@ reload
 ```
 
 After completing these steps, the `mdc-undertow-ext-3.0.1.jar` will be installed as a global module in JBoss EAP 7, and all applications deployed on the server will benefit from the `CorrelationIdGenerator` and `WrappingMdcExecutor` classes.
-```
