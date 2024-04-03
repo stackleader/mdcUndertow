@@ -1,4 +1,4 @@
-package com.rhc.mdc;
+package com.stackleader.mdc;
 
 import com.google.common.base.Stopwatch;
 import io.undertow.server.ExchangeCompletionListener;
@@ -17,6 +17,7 @@ public class CorrelationIdGenerator implements HttpHandler {
 
     private final HttpHandler handler;
     private static final Logger LOG = LoggerFactory.getLogger(CorrelationIdGenerator.class);
+    private static final String CORRELATION_ID_HEADER = "X-Correlation-Id";
 
     public CorrelationIdGenerator(HttpHandler handler) {
         this.handler = handler;
@@ -24,20 +25,14 @@ public class CorrelationIdGenerator implements HttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
-        String correlationIdHeader = Optional.ofNullable(exchange.getRequestHeaders().get("X-Correlation-Id"))
+        String correlationId = Optional.ofNullable(exchange.getRequestHeaders().get(CORRELATION_ID_HEADER))
                 .map(HeaderValues::getFirst)
                 .orElse(UUID.randomUUID().toString());
-        String uuidHeader = Optional.ofNullable(exchange.getRequestHeaders().get("uuid"))
-                .map(HeaderValues::getFirst)
-                .orElse(correlationIdHeader);
-        MDC.put("correlationId", uuidHeader);
+        MDC.put("correlationId", correlationId);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("[Request Headers]");
-            for (HeaderValues header : exchange.getRequestHeaders()) {
-                for (String value : header) {
-                    LOG.trace("header=" + header.getHeaderName() + " value=" + value);
-                }
-            }
+            exchange.getRequestHeaders().forEach(header
+                    -> header.forEach(value -> LOG.trace("header={} value={}", header.getHeaderName(), value))
+            );
         }
         LOG.info("[METRICS] Starting timer for requestMethod={} requestPath={} request", exchange.getRequestMethod(), exchange.getRequestPath());
         exchange.addExchangeCompleteListener(new ResponseTimeLogger());
